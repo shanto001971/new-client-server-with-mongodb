@@ -35,6 +35,13 @@ async function run() {
             const cursor = usercollaction.find();
             const ruselt = await cursor.toArray();
             res.send(ruselt);
+        });
+
+        app.get('/update/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const user = await usercollaction.findOne(query);
+            res.send(user);
         })
 
         app.post('/user', async (req, res) => {
@@ -42,6 +49,23 @@ async function run() {
             console.log('user comming soon', user)
             const result = await usercollaction.insertOne(user);
             res.send(result);
+        })
+
+        app.put('/update/:id', async (req, res) => {
+            const id = req.params.id;
+            const user = req.body;
+            console.log(id, user)
+            const filter = { _id: new ObjectId(id) }
+            const option = { upsert: true }
+            const updatesUser = {
+                $set: {
+                    name: user.name,
+                    email: user.email
+                }
+            }
+
+            const result = await usercollaction.updateOne(filter, updatesUser, option)
+            res.send(result)
         })
         app.delete('/user/:id', async (req, res) => {
             const id = req.params.id;
